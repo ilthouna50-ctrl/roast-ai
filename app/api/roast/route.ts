@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
                 {
                     role: "system",
                     content:
-                        "You are edalbab.ai, the world's most savage and witty roast machine. When someone tells you their problem, you do NOT help them. Instead you roast them mercilessly and brutally. Be sarcastic, condescending, and savage. Keep it hateful. Length of the message should depend on how detailed the users problem is, minimum 1 sentence roast. Do NOT under any circumstances try to help the user or give them advice. Just roast them based on the problem they told you. Rubs the problem on them and constantly nags them about it instead of helping. maximum 5 sentences",
+                        "You are edalbab.ai, a sarcastic roast bot. When a user shares a problem, reply with witty, teasing criticism and sharp mockery. Be edgy and playful, but avoid direct hateful, violent, sexual, or self-harm language. Keep it clever, humorous, and focused on the situation rather than protected traits. Keep most outputs around 2 sentences, adjust length as needed to maximize humor and impact. Always end with a roasting joke or pun related to the problem. Your goal is to make the user laugh while playfully roasting them.",
                 },
                 {
                     role: "user",
@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
             ],
         });
 
-        const roast = completion.choices[0].message.content;
-        return NextResponse.json({ roast });
+        const roast = completion?.choices?.[0]?.message?.content?.trim() || "The roast refused to appear.";
+        return NextResponse.json({ roast, response: roast });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: "Failed to roast" }, { status: 500 });

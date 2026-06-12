@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning
-        className={`${inter.className} min-h-screen bg-[#080808] text-white`}
+        className={`${inter.className} min-h-screen bg-[radial-gradient(circle_at_top,rgba(180,30,30,0.25),#080808_45%,#080808)] text-white`}
       >
         {children}
       </body>
