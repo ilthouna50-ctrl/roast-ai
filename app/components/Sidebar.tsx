@@ -62,7 +62,7 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
                 <button
                     type="button"
                     onClick={() => setIsCollapsed((current) => !current)}
-                    className="mt-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#111111]/95 text-sm text-white shadow-lg transition hover:bg-[#111111]"
+                    className="mt-4 hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#111111]/95 text-sm text-white shadow-lg transition hover:bg-[#111111] md:inline-flex"
                 >
                     {isCollapsed ? '>' : '<'}
                 </button>
@@ -128,6 +128,7 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
                                                             value={editingTitle}
                                                             onChange={(event) => setEditingTitle(event.target.value)}
                                                             onKeyDown={(event) => {
+                                                                event.stopPropagation();
                                                                 if (event.key === "Enter") {
                                                                     event.preventDefault();
                                                                     onRenameChat(chat.id, editingTitle.trim() || chat.title);
@@ -140,6 +141,7 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
                                                                 }
                                                             }}
                                                             onBlur={() => {
+                                                                onRenameChat(chat.id, editingTitle.trim() || chat.title);
                                                                 setEditingChatId(null);
                                                                 setEditingTitle("");
                                                             }}
