@@ -16,11 +16,12 @@ type Chat = {
     id: string;
     title: string;
     messages: ChatMessage[];
+    pinned: boolean;
 };
 
 function createChat() {
     const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    return { id, title: "New chat", messages: [] } as Chat;
+    return { id, title: "New chat", messages: [], pinned: false } as Chat;
 }
 
 function generateChatTitle(problem: string) {
@@ -66,7 +67,7 @@ export default function Page() {
     const [isWaiting, setIsWaiting] = useState(false);
     const [waitingChatId, setWaitingChatId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [viewportHeight, setViewportHeight] = useState(0);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -85,23 +86,20 @@ export default function Page() {
     }, [stage]);
 
     useEffect(() => {
-        const updateViewportHeight = () => {
-            if (window.visualViewport) {
-                setViewportHeight(window.visualViewport.height);
-            } else {
-                setViewportHeight(window.innerHeight);
-            }
+        const handler = () => {
+            const vv = (window as any).visualViewport;
+            const vvHeight = vv ? vv.height : window.innerHeight;
+            const offset = Math.max(0, window.innerHeight - vvHeight);
+            setKeyboardOffset(offset);
         };
 
-        updateViewportHeight();
-        const onResize = () => updateViewportHeight();
-
-        window.visualViewport?.addEventListener("resize", onResize);
-        window.addEventListener("resize", onResize);
+        handler();
+        (window as any).visualViewport?.addEventListener("resize", handler);
+        window.addEventListener("resize", handler);
 
         return () => {
-            window.visualViewport?.removeEventListener("resize", onResize);
-            window.removeEventListener("resize", onResize);
+            (window as any).visualViewport?.removeEventListener("resize", handler);
+            window.removeEventListener("resize", handler);
         };
     }, []);
 
@@ -126,6 +124,14 @@ export default function Page() {
         setError(null);
         setMobileSidebarOpen(false);
     };
+
+    const handlePinChat = (id: string) => {
+        setChats((current) => current.map((c) => (c.id === id ? { ...c, pinned: !c.pinned } : c)));
+    };
+
+    const sortedChats = useMemo(() => {
+        return [...chats].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+    }, [chats]);
 
     const handleSelectChat = (id: string) => {
         setActiveChatId(id);
@@ -225,11 +231,12 @@ export default function Page() {
             <div className="mx-auto flex h-screen max-w-full overflow-hidden bg-transparent text-slate-100">
                 <div className="hidden md:block">
                     <Sidebar
-                        chats={chats}
+                        chats={sortedChats}
                         activeChat={activeChat.id}
                         onNewChat={handleNewChat}
                         onSelectChat={handleSelectChat}
                         onDeleteChat={handleDeleteChat}
+                        onPinChat={handlePinChat}
                         onRenameChat={(id, title) => {
                             setChats((current) =>
                                 current.map((chat) => (chat.id === id ? { ...chat, title } : chat))
@@ -246,11 +253,12 @@ export default function Page() {
                         />
                         <div className="relative z-10 h-full w-full max-w-[280px]">
                             <Sidebar
-                                chats={chats}
+                                chats={sortedChats}
                                 activeChat={activeChat.id}
                                 onNewChat={handleNewChat}
                                 onSelectChat={handleSelectChat}
                                 onDeleteChat={handleDeleteChat}
+                                onPinChat={handlePinChat}
                                 onRenameChat={(id, title) => {
                                     setChats((current) =>
                                         current.map((chat) => (chat.id === id ? { ...chat, title } : chat))
@@ -280,7 +288,7 @@ export default function Page() {
                                 </div>
                             ) : (
                                 <div className="flex h-full flex-col overflow-hidden px-6 py-6">
-                                    <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+                                    <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-32">
                                         <div className="space-y-4">
                                             {activeChat.messages.map((message, index) => (
                                                 <div
@@ -325,7 +333,7 @@ export default function Page() {
                             )}
                         </div>
 
-                        <div className="sticky bottom-0 z-10" style={{ bottom: typeof window !== 'undefined' && viewportHeight ? Math.max(0, window.innerHeight - viewportHeight) : 0 }}>
+                        <div className="fixed bottom-0 left-0 right-0 md:left-[280px] z-10" style={{ transform: `translateY(-${keyboardOffset}px)` }}>
                             {error && <div className="mb-3 text-sm text-red-300 px-6">{error}</div>}
                             <div className="mx-auto mb-6 w-full max-w-3xl px-4 sm:px-6">
                                 <div className="flex items-center gap-3 rounded-full border border-white/10 bg-[#141414] px-3 py-2 sm:px-4 sm:py-2">
