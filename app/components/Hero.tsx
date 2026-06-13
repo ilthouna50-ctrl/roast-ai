@@ -7,22 +7,22 @@ export default function Hero() {
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-transparent text-center text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.22),transparent_35%)]" />
 
-      <div className="relative z-10 flex w-full max-w-4xl flex-col items-center gap-8 px-4 sm:px-6">
+      <div className="relative z-10 flex w-full max-w-4xl flex-col items-center gap-4 sm:gap-8 px-4 sm:px-6">
         <div className="animate-[pulseGlow_3.6s_ease-in-out_infinite] rounded-full">
           <Image
             src="/logo.jpg"
             alt="Logo"
-            width={220}
-            height={220}
-            className="h-[220px] w-[220px] rounded-full object-cover sm:h-[280px] sm:w-[280px]"
+            width={280}
+            height={280}
+            className="h-36 w-36 rounded-full object-cover sm:h-64 sm:w-64"
           />
         </div>
 
-        <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-5xl">
+        <h1 className="max-w-3xl text-2xl font-bold leading-tight text-white sm:text-3xl md:text-5xl">
           Welcome Back
         </h1>
 
-        <p className="max-w-2xl text-sm text-slate-400 sm:text-base md:text-lg">
+        <p className="max-w-2xl text-xs text-slate-400 sm:text-sm md:text-lg mb-6">
           edalbab.ai — Speak your mind. Regret it instantly.
         </p>
       </div>
