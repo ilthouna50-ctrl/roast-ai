@@ -67,7 +67,6 @@ export default function Page() {
     const [isWaiting, setIsWaiting] = useState(false);
     const [waitingChatId, setWaitingChatId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [keyboardOffset, setKeyboardOffset] = useState(0);
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -85,23 +84,7 @@ export default function Page() {
         }
     }, [stage]);
 
-    useEffect(() => {
-        const handler = () => {
-            const vv = (window as any).visualViewport;
-            const vvHeight = vv ? vv.height : window.innerHeight;
-            const offset = Math.max(0, window.innerHeight - vvHeight);
-            setKeyboardOffset(offset);
-        };
-
-        handler();
-        (window as any).visualViewport?.addEventListener("resize", handler);
-        window.addEventListener("resize", handler);
-
-        return () => {
-            (window as any).visualViewport?.removeEventListener("resize", handler);
-            window.removeEventListener("resize", handler);
-        };
-    }, []);
+    // keyboard handling removed in favor of scrollIntoView on textarea focus
 
     const activeChat = useMemo(
         () => chats.find((chat) => chat.id === activeChatId) ?? chats[0],
@@ -227,8 +210,8 @@ export default function Page() {
     }
 
     return (
-        <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.18),transparent_24%),radial-gradient(circle_at_bottom,rgba(239,68,68,0.16),transparent_30%),linear-gradient(180deg,#080808,#0b0202)] text-white">
-            <div className="mx-auto flex h-screen max-w-full overflow-hidden bg-transparent text-slate-100">
+        <div className="min-h-[100dvh] bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.18),transparent_24%),radial-gradient(circle_at_bottom,rgba(239,68,68,0.16),transparent_30%),linear-gradient(180deg,#080808,#0b0202)] text-white">
+            <div className="mx-auto flex h-full max-w-full overflow-hidden bg-transparent text-slate-100">
                 <div className="hidden md:block">
                     <Sidebar
                         chats={sortedChats}
@@ -333,7 +316,7 @@ export default function Page() {
                             )}
                         </div>
 
-                        <div className="fixed bottom-0 left-0 right-0 md:left-[280px] z-10" style={{ transform: `translateY(-${keyboardOffset}px)` }}>
+                        <div className="sticky bottom-0 left-0 right-0 z-10">
                             {error && <div className="mb-3 text-sm text-red-300 px-6">{error}</div>}
                             <div className="mx-auto mb-6 w-full max-w-3xl px-4 sm:px-6">
                                 <div className="flex items-center gap-3 rounded-full border border-white/10 bg-[#141414] px-3 py-2 sm:px-4 sm:py-2">
@@ -343,6 +326,9 @@ export default function Page() {
                                         onChange={(event) => {
                                             setPrompt(event.target.value);
                                             resizeTextarea(event.target);
+                                        }}
+                                        onFocus={() => {
+                                            setTimeout(() => textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
                                         }}
                                         onKeyDown={handlePromptKeyDown}
                                         rows={1}
