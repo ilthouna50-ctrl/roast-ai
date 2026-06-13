@@ -66,6 +66,7 @@ export default function Page() {
     const [isWaiting, setIsWaiting] = useState(false);
     const [waitingChatId, setWaitingChatId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [viewportHeight, setViewportHeight] = useState(0);
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -82,6 +83,27 @@ export default function Page() {
             return () => window.clearTimeout(timer);
         }
     }, [stage]);
+
+    useEffect(() => {
+        const updateViewportHeight = () => {
+            if (window.visualViewport) {
+                setViewportHeight(window.visualViewport.height);
+            } else {
+                setViewportHeight(window.innerHeight);
+            }
+        };
+
+        updateViewportHeight();
+        const onResize = () => updateViewportHeight();
+
+        window.visualViewport?.addEventListener("resize", onResize);
+        window.addEventListener("resize", onResize);
+
+        return () => {
+            window.visualViewport?.removeEventListener("resize", onResize);
+            window.removeEventListener("resize", onResize);
+        };
+    }, []);
 
     const activeChat = useMemo(
         () => chats.find((chat) => chat.id === activeChatId) ?? chats[0],
@@ -303,7 +325,7 @@ export default function Page() {
                             )}
                         </div>
 
-                        <div className="sticky bottom-0 z-10">
+                        <div className="sticky bottom-0 z-10" style={{ bottom: typeof window !== 'undefined' && viewportHeight ? Math.max(0, window.innerHeight - viewportHeight) : 0 }}>
                             {error && <div className="mb-3 text-sm text-red-300 px-6">{error}</div>}
                             <div className="mx-auto mb-6 w-full max-w-3xl px-4 sm:px-6">
                                 <div className="flex items-center gap-3 rounded-full border border-white/10 bg-[#141414] px-3 py-2 sm:px-4 sm:py-2">

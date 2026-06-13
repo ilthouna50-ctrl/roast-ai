@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageSquare, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type ChatMessage = {
     role: "user" | "ai";
@@ -27,7 +27,9 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
     const [searchTerm, setSearchTerm] = useState("");
     const [editingChatId, setEditingChatId] = useState<string | null>(null);
     const [editingTitle, setEditingTitle] = useState("");
+    const [longPressedChatId, setLongPressedChatId] = useState<string | null>(null);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const longPressTimer = useRef<number | null>(null);
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     const visibleChats = useMemo(() => {
@@ -105,10 +107,41 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
                                             key={chat.id}
                                             role="button"
                                             tabIndex={0}
-                                            onClick={() => onSelectChat(chat.id)}
+                                            onClick={() => {
+                                                setLongPressedChatId(null);
+                                                onSelectChat(chat.id);
+                                            }}
+                                            onTouchStart={() => {
+                                                if (longPressTimer.current) {
+                                                    window.clearTimeout(longPressTimer.current);
+                                                }
+                                                longPressTimer.current = window.setTimeout(() => {
+                                                    setLongPressedChatId(chat.id);
+                                                    longPressTimer.current = null;
+                                                }, 500);
+                                            }}
+                                            onTouchMove={() => {
+                                                if (longPressTimer.current) {
+                                                    window.clearTimeout(longPressTimer.current);
+                                                    longPressTimer.current = null;
+                                                }
+                                            }}
+                                            onTouchEnd={() => {
+                                                if (longPressTimer.current) {
+                                                    window.clearTimeout(longPressTimer.current);
+                                                    longPressTimer.current = null;
+                                                }
+                                            }}
+                                            onTouchCancel={() => {
+                                                if (longPressTimer.current) {
+                                                    window.clearTimeout(longPressTimer.current);
+                                                    longPressTimer.current = null;
+                                                }
+                                            }}
                                             onKeyDown={(event) => {
                                                 if (event.key === "Enter" || event.key === " ") {
                                                     event.preventDefault();
+                                                    setLongPressedChatId(null);
                                                     onSelectChat(chat.id);
                                                 }
                                             }}
@@ -165,7 +198,7 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
                                                         setEditingChatId(chat.id);
                                                         setEditingTitle(chat.title);
                                                     }}
-                                                    className="opacity-0 transition duration-150 ease-out group-hover:opacity-100"
+                                                    className={`${longPressedChatId === chat.id ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} transition duration-150 ease-out`}
                                                 >
                                                     <Pencil className="h-4 w-4 text-slate-400 hover:text-red-400" />
                                                 </button>
@@ -175,7 +208,7 @@ export default function Sidebar({ chats, activeChat, onNewChat, onSelectChat, on
                                                         event.stopPropagation();
                                                         onDeleteChat(chat.id);
                                                     }}
-                                                    className="opacity-0 transition duration-150 ease-out group-hover:opacity-100"
+                                                    className={`${longPressedChatId === chat.id ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} transition duration-150 ease-out`}
                                                 >
                                                     <Trash2 className="h-4 w-4 text-slate-400 hover:text-red-400" />
                                                 </button>
