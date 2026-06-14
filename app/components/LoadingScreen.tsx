@@ -9,24 +9,31 @@ export default function LoadingScreen() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/85 to-black" />
 
             <div className="relative flex flex-col items-center gap-6 px-6 text-center">
-                <div className="relative">
-                    <div className="absolute inset-0 rounded-full bg-red-500/20 blur-2xl opacity-80 animate-[glowPulse_2.8s_ease-in-out_infinite]" />
-                    <Image
-                        src="/logo.jpg"
-                        alt="Logo"
-                        width={120}
-                        height={120}
-                        className="relative h-[120px] w-[120px] rounded-full object-cover animate-[lift_2.8s_ease-in-out_infinite]"
-                    />
-                </div>
+                <div className="relative flex flex-col items-center gap-6">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-red-500/10 blur-3xl opacity-60 animate-[glowPulse_2.8s_ease-in-out_infinite]" />
+                        <Image
+                            src="/logo.jpg"
+                            alt="Logo"
+                            width={160}
+                            height={160}
+                            priority
+                            className="relative h-[160px] w-[160px] object-contain animate-[lift_2.8s_ease-in-out_infinite]"
+                        />
+                    </div>
 
-                <div className="w-[240px] overflow-hidden rounded-full border border-white/10 bg-white/10">
-                    <div className="h-2 w-full rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300 animate-[loadingProgress_2.4s_ease-in-out_1]" />
-                </div>
+                    <p className="text-lg font-bold tracking-widest text-white">
+                        edalbab.ai
+                    </p>
 
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
-                    Summoning the demons...
-                </p>
+                    <div className="w-[240px] overflow-hidden rounded-full border border-white/10 bg-white/10">
+                        <div className="h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300 animate-[loadingProgress_2.4s_ease-in-out_1_forwards]" />
+                    </div>
+
+                    <p className="text-xs uppercase tracking-[0.35em] text-slate-400">
+                        Summoning the demons...
+                    </p>
+                </div>
             </div>
 
             <style>{`
@@ -35,12 +42,15 @@ export default function LoadingScreen() {
                     50% { transform: translateY(-10px); }
                 }
                 @keyframes glowPulse {
-                    0%, 100% { opacity: 0.6; filter: blur(12px); }
-                    50% { opacity: 1; filter: blur(24px); }
+                    0%, 100% { opacity: 0.5; filter: blur(20px); }
+                    50% { opacity: 0.9; filter: blur(40px); }
                 }
                 @keyframes loadingProgress {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(0); }
+                    0% { width: 0%; }
+                    60% { width: 65%; }
+                    75% { width: 65%; }
+                    85% { width: 68%; }
+                    100% { width: 100%; }
                 }
             `}</style>
         </div>
