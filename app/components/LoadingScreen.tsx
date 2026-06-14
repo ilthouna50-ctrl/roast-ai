@@ -8,7 +8,7 @@ export default function LoadingScreen() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.22),transparent_40%)]" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/85 to-black" />
 
-            <div className="relative flex flex-col items-center gap-6 px-6 text-center">
+            <div className="relative flex flex-col items-center gap-6 px-6 text-center animate-[fadeInUp_0.4s_ease-out_forwards]">
                 <div className="relative flex flex-col items-center gap-6">
                     <div className="relative">
                         <div className="absolute inset-0 bg-red-500/10 blur-3xl opacity-60 animate-[glowPulse_2.8s_ease-in-out_infinite]" />
@@ -37,6 +37,10 @@ export default function LoadingScreen() {
             </div>
 
             <style>{`
+                @keyframes fadeInUp {
+                    0% { opacity: 0; transform: translateY(16px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
                 @keyframes lift {
                     0%, 100% { transform: translateY(0); }
                     50% { transform: translateY(-10px); }
